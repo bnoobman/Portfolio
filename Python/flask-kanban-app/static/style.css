@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.board {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.column {
+    width: 30%;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.column h2 {
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #fff;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* General styling for tasks */
+.task {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+}
+
+/* Styling for the task being dragged */
+.task:active {
+    cursor: grabbing;
+    opacity: 0.5; /* Makes the task semi-transparent when dragging */
+}
+
+/* Styling for valid drop targets (columns) */
+.column {
+    background-color: #f4f4f4;
+    border: 2px solid transparent;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.column:hover {
+    border-color: #007bff; /* Highlight the column when a task is dragged over it */
+}
+
+/* Error message banner */
+.error-banner {
+    background-color: #ffcccc;
+    color: #b30000;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #b30000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.error-banner p {
+    margin: 0;
+}
+
+
+.add-column-form {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.add-column-form h3 {
+    margin-bottom: 10px;
+}
+
+.add-column-form input {
+    margin-right: 10px;
+}

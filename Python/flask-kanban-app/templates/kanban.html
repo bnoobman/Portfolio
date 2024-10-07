@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Kanban Board</title>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+<div class="error-banner" id="error-banner" style="display: none;">
+    <p id="error-message"></p>
+</div>
+
+<!-- Container to hold the sidebar and board -->
+<div class="container">
+    <!-- Sidebar for Board List -->
+    <div class="sidebar">
+        <h2>Boards</h2>
+        <ul>
+            {% for board in boards %}
+            <li>
+                <a href="{{ url_for('kanban_board', board_id=board.id) }}">{{ board.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <button onclick="showCreateBoardForm()">Create New Board</button>
+
+        <!-- Form to create a new board (initially hidden) -->
+        <div id="createBoardForm" style="display: none;">
+            <form action="{{ url_for('create_board') }}" method="POST">
+                <label for="board_name">Board Name:</label>
+                <input type="text" name="board_name" required>
+                <button type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Board Content (Kanban Board) -->
+    <div class="board">
+        {% for column in columns %}
+        <div class="column" data-column-id="{{ column.id }}"
+             ondragover="allowDrop(event)" ondrop="drop(event)">
+            <h2>{{ column.name }}</h2>
+            <ul>
+                {% for task in column.tasks %}
+                <!-- For each task, add an edit button -->
+                <li id="task-{{ task.id }}" class="task" draggable="true" ondragstart="drag(event)" data-task-id="{{ task.id }}">
+                    <p>{{ task.title }}</p>
+                    <p id="task-desc-{{ task.id }}">{{ task.description }}</p>
+                    <button onclick="showEditTaskForm({{ task.id }})">Edit</button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <!-- Form to add a new task -->
+            <form action="{{ url_for('add_task') }}" method="POST">
+                <input name="title" placeholder="New Task" required type="text">
+                <input name="column_id" type="hidden" value="{{ column.id }}">
+                <button type="submit">Add Task</button>
+            </form>
+        </div>
+        {% endfor %}
+
+        <!-- Form to add a new column -->
+        <div class="add-column-form">
+            <h3>Add a New Column</h3>
+            <form action="{{ url_for('add_column', board_id=selected_board_id) }}" method="POST">
+                <input name="name" placeholder="New Column Name" required type="text">
+                <button type="submit">Add Column</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for editing tasks -->
+    <div class="modal" id="editTaskModal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditTaskForm()">&times;</span>
+            <form id="editTaskForm" onsubmit="submitEditTask(event)">
+                <input id="edit-task-id" type="hidden">
+                <label for="edit-task-title">Task Title:</label>
+                <input id="edit-task-title" required type="text">
+                <label for="edit-task-description">Description:</label>
+                <textarea id="edit-task-description"></textarea>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal styling (basic) -->
+<style>
+    .container {
+        display: flex;
+    }
+
+    .sidebar {
+        width: 200px;
+        padding: 20px;
+        background-color: #f0f0f0;
+    }
+
+    .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        margin-bottom: 10px;
+    }
+
+    .board {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    // Allow drop events on the columns
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    // When a task is dragged
+    function drag(ev) {
+        ev.dataTransfer.setData("task_id", ev.target.getAttribute("data-task-id"));
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var task_id = ev.dataTransfer.getData("task_id");
+        var column_id = ev.currentTarget.getAttribute("data-column-id");
+
+        // Move the task visually (in the UI)
+        var task = document.getElementById("task-" + task_id);
+        ev.currentTarget.querySelector("ul").appendChild(task);
+
+        // Make an AJAX call to update the task's column in the backend
+        fetch(`/move_task/${task_id}/${column_id}`, {
+            method: 'POST',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("Error:", data.error);
+                showError(`Failed to move task: ${data.error}`);
+                document.location.reload();  // Reload the page to reset state
+            } else {
+                console.log("Success:", data.success);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            showError('An unexpected error occurred while moving the task.');
+        });
+    }
+
+    function showEditTaskForm(taskId) {
+        var taskElement = document.getElementById('task-' + taskId);
+        var taskTitle = taskElement.querySelector('p').textContent;
+        var taskDescriptionElem = document.getElementById('task-desc-' + taskId);
+
+        document.getElementById('edit-task-id').value = taskId;
+        document.getElementById('edit-task-title').value = taskTitle;
+        document.getElementById('edit-task-description').value = taskDescriptionElem ? taskDescriptionElem.textContent : '';
+
+        document.getElementById('editTaskModal').style.display = 'block';
+    }
+
+    function closeEditTaskForm() {
+        document.getElementById('editTaskModal').style.display = 'none';
+    }
+
+    function submitEditTask(event) {
+        event.preventDefault();
+
+        var taskId = document.getElementById('edit-task-id').value;
+        var taskTitle = document.getElementById('edit-task-title').value;
+        var taskDescription = document.getElementById('edit-task-description').value;
+
+        fetch(`/edit_task/${taskId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: taskTitle,
+                description: taskDescription
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var taskElement = document.getElementById('task-' + taskId);
+                taskElement.querySelector('p').textContent = taskTitle;
+                var taskDescriptionElem = document.getElementById('task-desc-' + taskId);
+                taskDescriptionElem.textContent = taskDescription;
+                closeEditTaskForm();
+            } else {
+                alert('Failed to update task: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred while updating the task.');
+        });
+    }
+
+    function showCreateBoardForm() {
+        document.getElementById('createBoardForm').style.display = 'block';
+    }
+</script>
+</body>
+</html>
