@@ -1,0 +1,29 @@
+# Discord bot token
+DISCORD_TOKEN:
+# Discord Channel ID (#discord-api-test)
+DISCORD_CHANNEL_ID:
+
+
+# https://dev.twitch.tv/console/apps/ealy2brdnr8t5kph6g7851i429e2ee
+# Twitch.tv Application Client ID
+TWITCH_CLIENT_ID:
+# Twitch.tv Application Client Secret
+TWITCH_CLIENT_SECRET:
+# Twitch.tv Favorite Streamers List
+FAVORITE_STREAMERS: [ ]
+
+
+# Chess.com Configs
+# Chess.com Username
+CHESS_USERNAME:
+# Chess.com API Endpoint for games where it's my turn
+# todo figure out how the hell to not have to hard code this username value...
+CHESS_API_ENDPOINT_MY-TURN: 'https://api.chess.com/pub/player/{username}/games/'
+
+
+# Stock Market Configs
+STOCKS: [ 'AAPL', 'GOOGL', 'TSLA', 'AMZN' ]
+# Define U.S. stock market hours
+STOCK_MARKET_OPEN: 9  # 9:30 AM EST
+# STOCK_MARKET_CLOSE: 16  # 4:00 PM EST
+STOCK_MARKET_CLOSE: 23  # 11 PM EST TESTING
