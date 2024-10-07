@@ -1,0 +1,13 @@
+<div class="footer">
+  {% block footer %}
+    {% if theme_show_version and release %}
+      <div class="version">
+        {{ release }}
+      </div>
+    {% endif %}
+    <div class="copyright">
+      &copy; {{ copyright }} |
+      <a href="{{ license_url }}">License</a>
+    </div>
+  {% endblock %}
+</div>

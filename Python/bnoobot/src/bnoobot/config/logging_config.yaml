@@ -1,0 +1,32 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  detailed:
+    format: '%(asctime)s:%(levelname)s:%(name)s: %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: detailed
+    stream: ext://sys.stdout
+
+  file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: detailed
+    filename: discord_bot.log
+    maxBytes: 5000000  # 5 MB
+    backupCount: 5
+    encoding: utf8
+
+loggers:
+  discord:
+    level: INFO
+    handlers: [ console, file_handler ]
+    propagate: no
+
+root:
+  level: INFO
+  handlers: [ console, file_handler ]
