@@ -1,0 +1,49 @@
+name: Subtree Pull
+
+# Triggers the workflow on push or manually
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  subtree_pull:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the current repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    # Set up Git (GitHub Actions provides Git, but configure it)
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    # Pull the subtree
+    - name: Pull bnoobot subtree
+      run: |
+        git remote add bnoobot https://github.com/bnoobman/bnoobot.git
+        git fetch bnoobot
+        git subtree pull --prefix=Python/bnoobot bnoobot main --squash
+
+    # Pull the subtree
+    - name: Pull flask-kanban-app subtree
+      run: |
+        git remote add flask-kanban-app https://github.com/bnoobman/flask-kanban-app.git
+        git fetch flask-kanban-app
+        git subtree pull --prefix=Python/flask-kanban-app flask-kanban-app main --squash
+
+    # Pull the subtree
+    - name: Pull python-slot-machine subtree
+      run: |
+        git remote add python-slot-machine https://github.com/bnoobman/python-slot-machine.git
+        git fetch python-slot-machine
+        git subtree pull --prefix=Python/python-slot-machine python-slot-machine main --squash
+
+    # Push the changes to the repository
+    - name: Push changes
+      run: |
+        git push origin main
