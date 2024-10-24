@@ -4,3 +4,6 @@
 [submodule "Python/disc-golf-putting-practice-app"]
 	path = Python/disc-golf-putting-practice-app
 	url = https://github.com/bnoobman/disc-golf-putting-practice-app.git
+[submodule "Python/bnoobot"]
+	path = Python/bnoobot
+	url = https://github.com/bnoobman/bnoobot.git
