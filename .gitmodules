@@ -1,0 +1,6 @@
+[submodule "Python/book-collection-tracker"]
+	path = Python/book-collection-tracker
+	url = https://github.com/bnoobman/book-collection-tracker.git
+[submodule "Python/disc-golf-putting-practice-app"]
+	path = Python/disc-golf-putting-practice-app
+	url = https://github.com/bnoobman/disc-golf-putting-practice-app.git
